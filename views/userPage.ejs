@@ -1,0 +1,156 @@
+<!-- 
+EJS stands for, Embedded JavaSript. 
+This page is a dynamic placeholder for all the accounts that get registered in the project, with data passed from the Node.js server.
+-->
+
+<!DOCTYPE html> <!-- Declares definition of the document type as HTML5 -->
+<html lang="en"> <!-- Opening tag for the HTML document specifies the language as English -->
+<head> <!-- Head element contains meta-information about the document -->
+  <meta charset="UTF-8"> <!-- Defines the character set for the document to be UTF-8 -->
+  <title><%= user.username %>'s Profile</title> <!-- The title of the webpage, displayed on the browser tab. -->
+  <link rel="stylesheet" href="/css/style.css"> <!-- Links to an external CSS file for styling the page -->
+  <style>
+    .circle-btn {
+      display: block; /* Sets the button to block level, meaning it will take up the full width available */
+      width: 50px; /* Sets the width of the button to 50 pixels */
+      height: 50px; /* Sets the height of the button to 50 pixels */
+      background-color: #f20909; /* Sets the background color of the button to a specific shade of red */
+      border-radius: 50%; /* Rounds the corners of the button to make it a circle */
+      text-align: center; /* Centers the text horizontally within the button */
+      line-height: 50px; /* Sets the line height to the same as the button's height to center the text vertically */
+      color: rgb(224, 13, 13); /* Sets the text color using RGB color values */
+      font-size: 30px; /* Sets the size of the font (the dot symbol in this case) inside the button */
+    }
+
+    .profile-menu {
+      position: fixed; /* Keeps the element in the same place even when the page is scrolled */
+      top: 20px; /* Positions the element 20 pixels from the top of the viewport */
+      right: 20px; /* Positions the element 20 pixels from the right of the viewport */
+      cursor: pointer; /* Changes the cursor to a pointer when hovered over to indicate it's clickable */
+}
+
+
+    .profile-pic-container {
+      position: relative; /* Establishes a positioning context for absolutely positioned elements inside */
+      width: 50px; /* Sets the width of the container to 50 pixels */
+      height: 50px; /* Sets the height of the container to 50 pixels */
+      border-radius: 50%; /* Rounds the corners to make the container circular */
+    }
+
+    .profile-pic {
+      width: 100%; /* Makes the image fill the entire width of its container */
+      height: 100%; /* Makes the image fill the entire height of its container */
+      border-radius: 50%; /* Rounds the corners of the image to make it circular, matching the container */
+      object-fit: cover; /* Ensures the image covers the area of the container without distorting its aspect ratio */
+    }
+
+    .dropdown-content {
+      display: none; /* Initially hides the dropdown content until triggered */
+      position: absolute; /* Positions the dropdown content absolutely relative to its positioned ancestor */
+      right: 0; /* Aligns the dropdown content to the right edge of its parent */
+      background-color: #f9f9f9; /* Sets the background color of the dropdown content */
+      min-width: 160px; /* Sets a minimum width for the dropdown content */
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); /* Adds a shadow to make the dropdown visually distinct from the rest of the page */
+      z-index: 1; /* Ensures the dropdown content appears on top of other content */
+    }
+
+
+    .dropdown-content a {
+      color: black; /* Sets the text color of the links within the dropdown to black */
+      padding: 12px 16px; /* Adds padding around the links for better spacing and readability */
+      text-decoration: none; /* Removes the underline from the links to make them look cleaner */
+      display: block; /* Makes each link fill its own line, enhancing the dropdown menu layout */
+    }
+
+    .dropdown-content a:hover {background-color: #f1f1f1; /* Changes the background color of the links on hover for visual feedback */}
+  </style>
+  
+  <script>
+    
+  // Function to toggle the visibility of the dropdown menu
+  function toggleDropdown() {
+    // Selects the dropdown content using its class name
+    var dropdownContent = document.querySelector('.dropdown-content');
+    // Toggles the display style between 'block' and 'none' to show or hide the dropdown
+    dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+  }
+
+  // Defines a function for logging the user out
+  function logout() {
+    // Redirects the browser to the '/logout' URL, which handles the logout process
+    window.location.href = '/logout';
+  }
+
+  // Adds an event listener for clicks on the entire window
+  window.onclick = function(event) {
+    // Checks if the click is outside the profile picture or its container
+    if (!event.target.matches('.profile-pic-container') && !event.target.matches('.profile-pic')) {
+      // If the click is outside, it selects all dropdowns
+      var dropdowns = document.getElementsByClassName("dropdown-content");
+      // Iterates through all dropdown elements
+      for (var i = 0; i < dropdowns.length; i++) {
+        var openDropdown = dropdowns[i];
+        // Checks if the dropdown is currently displayed
+        if (openDropdown.style.display === 'block') {
+          // Hides the dropdown if it is currently shown
+          openDropdown.style.display = 'none';
+        }
+      }
+    }
+  }
+  function confirmRemoveProfilePic() {
+  var confirmAction = confirm("Remove profile picture?");
+  if (confirmAction) {
+    // if User clicked yes; redirect to the route that handles profile picture removal
+    window.location.href = '/remove-profile-pic';
+  } else {
+    // if (else) User clicked no; just redirect back to the user's main page
+    window.location.href = `/users/${<%= user.username %>}`;
+  }
+}
+  </script>
+</head>
+<body>
+<header>
+  <!-- Displays the greeting message and the user's username -->
+  <h1>Welcome to your profile, <%= user.username %>!</h1>
+  
+  <!-- Container for the profile menu, which includes the profile picture and the dropdown menu -->
+  <div class="profile-menu">
+    
+    <!-- Container for the profile picture, which toggles the dropdown menu on click -->
+    <div class="profile-pic-container" onclick="toggleDropdown()">
+      <!-- Updates the profile picture source to use the user's profile picture if it exists -->
+      <img src="<%= user.profilePicture || '/images/myblogdefaultimage1.png' %>" class="profile-pic" alt="Profile Picture">
+    </div>
+    
+    <!-- The dropdown content that appears when the profile picture is clicked -->
+    <div class="dropdown-content">
+      <!-- A link that triggers the hidden file input for uploading/changing the profile picture -->
+      <a href="#" onclick="document.getElementById('hiddenProfilePicInput').click();">Upload/Change Profile Picture</a>
+      <!-- Adds a link in the dropdown for removing the profile picture -->
+      <a href="#" onclick="confirmRemoveProfilePic()">Remove Profile Picture</a>      
+      <!-- A link that triggers the logout function -->
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+
+    <!-- Inserts the form here for the profile picture upload -->
+    <form id="profilePicForm" action="/upload-profile-pic" method="POST" enctype="multipart/form-data" style="display: none;">
+      <input type="file" name="profilePic" id="hiddenProfilePicInput" onchange="document.getElementById('profilePicForm').submit();">
+    </form>    
+    
+    
+    <!-- A hidden file input for uploading profile pictures, triggered by clicking the 'Upload/Change Profile Picture' link. -->
+    <input type="file" id="hiddenProfilePicInput" style="display: none;" onchange="uploadProfilePic()">
+  </div>
+</header>
+
+  <main>
+    <!-- User-specific content will go here -->
+  </main>
+
+  <footer>
+    <p>© 2024 My Blog</p>
+  </footer>
+</body>
+</html>
