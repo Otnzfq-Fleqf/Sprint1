@@ -8,6 +8,7 @@ const multer = require('multer'); // Utilizes the multer library for handling mu
 const path = require('path'); // Incorporates the path module to provide utilities for working with file and directory paths.
 const bcrypt = require('bcryptjs'); // Employs bcryptjs for hashing passwords, enhancing security by securely storing user passwords.
 const saltRounds = 10; // Defines salt rounds as a constant
+require('dotenv').config();
 
 // Configures storage for multer to define how files should be stored on the server.
 const storage = multer.diskStorage({
@@ -31,7 +32,7 @@ const port = 3000; // Port number where the server will listen
 // Middleware setup
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(session({
-  secret: 'yourSecretKey', // Secret key for signing the session ID cookie
+  secret: 'process.env.SESSION_SECRET', // Secret key for signing the session ID cookie
   resave: false, // Do not force session to be saved back to the session store
   saveUninitialized: true, // Forces a session that is "uninitialized" to be saved to the store
 }));
@@ -43,8 +44,7 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 // Connects to MongoDB Atlas database
-const dbURI = 'mongodb+srv://USERNAME:CONNECTION PASSWORD';
-mongoose.connect(dbURI)
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.error('Error connecting to MongoDB Atlas', err));
 
@@ -52,8 +52,8 @@ mongoose.connect(dbURI)
 const transporter = nodemailer.createTransport({
   service: 'gmail', // Using Gmail for the automated messages
   auth: {
-    user: 'fullstacktestingwebdev@gmail.com', // Your actual email
-    pass: 'PASSWORD WILL BE ENTERED HERE TO SEND AUTOMATED EMAIL' // Your actual password (this uses the "less secure apps" method from Google)
+    user: 'process.env.NODEMAILER_USER', // Your actual email
+    pass: 'process.env.NODEMAILER_PASS' // Your actual password (this uses the "less secure apps" method from Google)
   }
 });
 
