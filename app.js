@@ -32,7 +32,7 @@ const port = 3000; // Port number where the server will listen
 // Middleware setup
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(session({
-  secret: 'process.env.SESSION_SECRET', // Secret key for signing the session ID cookie
+  secret: process.env.SESSION_SECRET, // Secret key for signing the session ID cookie
   resave: false, // Do not force session to be saved back to the session store
   saveUninitialized: true, // Forces a session that is "uninitialized" to be saved to the store
 }));
@@ -43,17 +43,19 @@ app.use(express.static('public'));
 // Sets EJS as the view engine for the application
 app.set('view engine', 'ejs');
 
-// Connects to MongoDB Atlas database
-mongoose.connect(process.env.MONGODB_URI)
+// Connects to MongoDB Atlas database the actual connection string looks like this: 
+//mongodb+srv://<username>:<password>@myblogdatabase.cvpz0hl.mongodb.net/?retryWrites=true&w=majority
+const dbURI = process.env.LOGININFO;
+mongoose.connect(dbURI)
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.error('Error connecting to MongoDB Atlas', err));
 
 // Configures Nodemaile for sending emails to users on verification
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // Using Gmail for the automated messages
+  service: process.env.MAIL_SERVICE,
   auth: {
-    user: 'process.env.NODEMAILER_USER', // Your actual email
-    pass: 'process.env.NODEMAILER_PASS' // Your actual password (this uses the "less secure apps" method from Google)
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASS
   }
 });
 
